@@ -99,15 +99,15 @@ def get_eig(A):
 
 #Example
 
-A = [[2, 3, 1], [3, 1, 0], [1, 0, 2]]
-eigvec, eigval = get_eig(A)
-
-
-print("eigvec:")
-pprint(eigvec)
-print("eigvals:")
-pprint(eigval)
-print("los posta:")
-posta = la.eig(A)
-pprint(posta[1])
-pprint(posta[0])
+# A = [[2, 3, 1], [3, 1, 0], [1, 0, 2]]
+# eigvec, eigval = get_eig(A)
+#
+#
+# print("eigvec:")
+# pprint(eigvec)
+# print("eigvals:")
+# pprint(eigval)
+# print("los posta:")
+# posta = la.eig(A)
+# pprint(posta[1])
+# pprint(posta[0])

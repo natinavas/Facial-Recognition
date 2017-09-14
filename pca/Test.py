@@ -1,10 +1,10 @@
 import numpy
 from PIL import Image
-
+import qr
 THRESHOLD = 0.9
 
 # Load images
-images = list(None for i in range(1,410))
+images = list(None for i in range(400))
 for i in range(1,41):
     for j in range(1,11):
         dir= "/Users/natinavas/Documents/ITBA/MNA/orl_faces/s"+str(i)+"/"+str(j)+".pgm"
@@ -12,7 +12,8 @@ for i in range(1,41):
         images[(i-1)*10+(j-1)]=list(Image.open(dir).getdata())
 
 # Create matrix out of images
-matrix = numpy.transpose(numpy.matrix(images))
+m = numpy.matrix(images)
+matrix = numpy.transpose(m)
 
 print('2----')
 # print(matrix)
@@ -31,6 +32,9 @@ print('4----')
 #TODO: hacer bien
 #OBS: se esta asumiendo que los eigen values estan ordenados.
 eig_values, eig_vectors = numpy.linalg.eig(covariance_matrix)
+
+#Custom eig with QR (householder). eig values returned in descending order
+#eig_values, eig_vectors = qr.get_eig(covariance_matrix)
 print('5----')
 
 # Get best eigenvalues
@@ -46,4 +50,4 @@ print('7----')
 # Project values on eigen vectors
 projected_values = numpy.transpose(centered_matrix)*best_eig_vectors
 
-print(projected_values)
+#print(projected_values)
