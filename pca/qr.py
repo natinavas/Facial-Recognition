@@ -2,6 +2,7 @@ from math import sqrt
 from pprint import pprint
 import numpy.linalg as la
 import numpy as np
+import qrhh
 
 def mult_matrix(M, N):
     """Multiply square matrices of same dimension M and N"""
@@ -84,12 +85,18 @@ def get_eig(A):
     Q, R = np.linalg.qr(A)
     A = np.multiply(R, Q)
     C = Q
+    # Multiply the matrices while A is not diagonal
     while not is_diag(A, 0.001):
-        Q, R = np.linalg.qr(A)
+        #Q, R = np.linalg.qr(A)
+        Q, R = qrhh.QRHH(A)
         A = np.multiply(R, Q)
         C = np.multiply(C, Q)
+    # Get the absolute values of R, so that when sorting it does
+    # it according to the absolute value
     R = map(abs, R)
+    # Get the diagonal of R that has the eigenvalues
     eigvalues = np.diagonal(R)
+    # Order the eigenvalues
     indices = eigvalues.argsort()[::-1]
     eigvalues = sorted(eigvalues, key=int, reverse=True)
     C = np.matrix(C)
