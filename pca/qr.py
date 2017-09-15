@@ -81,18 +81,18 @@ def is_diag(A, error):
     return True
 
 def get_eig(A):
-    Q, R = householder(A)
-    A = mult_matrix(R, Q)
+    Q, R = np.linalg.qr(A)
+    A = np.multiply(R, Q)
     C = Q
-    while not is_diag(A, 0.0000001):
-        Q, R = householder(A)
-        A = mult_matrix(R, Q)
-        C = mult_matrix(C, Q)
+    while not is_diag(A, 0.001):
+        Q, R = np.linalg.qr(A)
+        A = np.multiply(R, Q)
+        C = np.multiply(C, Q)
+    R = map(abs, R)
     eigvalues = np.diagonal(R)
     indices = eigvalues.argsort()[::-1]
     eigvalues = sorted(eigvalues, key=int, reverse=True)
     C = np.matrix(C)
-
     C = C[:][indices]
     return C, eigvalues
 
