@@ -1,5 +1,6 @@
 import numpy as np
-import householder as hh
+import Householder as hh
+import GS as gs
 
 def qr_Householder(A):
     n = np.ma.size(A, 0)
@@ -26,13 +27,13 @@ def is_diag(A, error):
 
 def get_eig(A):
 
-    Q, R = qr_Householder(A)
+    Q, R = gs.gram_schmidt(A)
     assert np.allclose(A, Q.dot(R))
     A = R.dot(Q)
     C = Q
 
     while not is_diag(A, 0.0000001):
-        Q, R = qr_Householder(A)
+        Q, R = gs.gram_schmidt(A)
         assert np.allclose(A, Q.dot(R))
         A = R.dot(Q)
         C = C.dot(Q)

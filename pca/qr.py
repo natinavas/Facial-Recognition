@@ -29,7 +29,7 @@ def is_diag(A, error):
 def get_eig(A):
     #Q, R = householder(A)
 
-    Q, R = qr.qr_Householder(A)
+    Q, R = qr_Householder(A)
     assert np.allclose(A, Q.dot(R))
     #A = mult_matrix(R, Q)
     A = R.dot(Q)
@@ -37,7 +37,7 @@ def get_eig(A):
 
     while not is_diag(A, 0.00001):
         #Q, R = householder(A)
-        Q, R = qr.qr_Householder(A)
+        Q, R = qr_Householder(A)
         #A = mult_matrix(R, Q)
         #C = mult_matrix(C, Q)
         assert np.allclose(A, Q.dot(R))

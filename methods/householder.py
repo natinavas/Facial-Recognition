@@ -8,13 +8,13 @@ def k_householder(M,k):
 
     a = subM[:,0]
     u = calculate_U(a)
-    v = u/np.linalg.norm(u, ord=None, axis=None, keepdims=False)
+    v = u/np.linalg.norm(u, ord=None, axis=None)
     subP = subI - 2*v.dot(v.transpose())
     P[k-1:,k-1:] = subP
     return P
 
 def calculate_U(a):
-    alfa = np.linalg.norm(a, ord=None, axis=None, keepdims=False) * (-1.0) * np.sign(a[0,0])
+    alfa = np.linalg.norm(a, ord=None, axis=None) * (-1.0) * np.sign(a[0,0])
     e = np.zeros((len(a),1))
     e[0] = 1
     return a - alfa*e
