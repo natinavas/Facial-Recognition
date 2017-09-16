@@ -1,15 +1,15 @@
-import numpy as np
-from PIL import Image
-import qr
 import argparse
-import GS as gs
+import numpy as np
 
 import scipy.misc
+from PIL import Image
+
+import qr
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
 # Define parser and get input values
-DEFAULT_PATH = "../att_faces/orl_faces/s"
+DEFAULT_PATH = "../att_faces/s"
 parser = argparse.ArgumentParser(description='Facial Recognition software with PCA')
 parser.add_argument('--images', '-i', type=str, default=DEFAULT_PATH, dest="images")
 parser.add_argument('--image_type', '-it', type=str, default='.pgm', dest="image_type")

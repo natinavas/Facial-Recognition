@@ -1,8 +1,7 @@
-from math import sqrt
-from pprint import pprint
-import numpy.linalg as la
 import numpy as np
-import GS
+from math import sqrt
+from methods import GS
+from methods import qr
 
 
 def mult_matrix(M, N):
@@ -78,14 +77,14 @@ def householder(A):
 def is_diag(A, error):
     for i in range(len(A)):
         for j in range(len(A[0])):
-            if(i != j) and (np.abs(A[i][j]) > error):
+            if(i != j) and (np.abs(A[i,j]) > error):
                 return False
     return True
 
 def get_eig(A):
     #Q, R = householder(A)
 
-    Q, R = GS.gram_schmidt(A)
+    Q, R = qr.qr_Householder(A)
     assert np.allclose(A, Q.dot(R))
     #A = mult_matrix(R, Q)
     A = R.dot(Q)
@@ -93,7 +92,7 @@ def get_eig(A):
 
     while not is_diag(A, 0.00001):
         #Q, R = householder(A)
-        Q, R = GS.gram_schmidt(A)
+        Q, R = qr.qr_Householder(A)
         #A = mult_matrix(R, Q)
         #C = mult_matrix(C, Q)
         assert np.allclose(A, Q.dot(R))
