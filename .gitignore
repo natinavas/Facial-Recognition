@@ -1,3 +1,9 @@
+#Image Files#
+*.img
+*.pgm
+*.bmp
+*.jpg
+
 # compiled source #
 ###################
 *.com
