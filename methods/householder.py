@@ -2,16 +2,21 @@ import numpy as np
 
 def k_householder(M,k):
     n = np.ma.size(M,0)
-    I = np.identity(n,dtype=None)
-    a = M[:,k-1]
-    u = calculate_U(a,k)
-    v = u/np.linalg.norm(u, ord=None, axis=None, keepdims=False)
-    return I - 2*v*np.ma.transpose(v)
+    P = np.identity(n,dtype=None)
+    subM = M[k-1:,k-1:]
+    subI = np.identity(np.ma.size(subM,0),dtype=None)
 
-def calculate_U(a, k):
-    alfa = np.linalg.norm(a, ord=None, axis=None, keepdims=False)
+    a = subM[:,0]
+    u = calculate_U(a)
+    v = u/np.linalg.norm(u, ord=None, axis=None, keepdims=False)
+    subP = subI - 2*v.dot(v.transpose())
+    P[k-1:,k-1:] = subP
+    return P
+
+def calculate_U(a):
+    alfa = np.linalg.norm(a, ord=None, axis=None, keepdims=False) * (-1.0) * np.sign(a[0,0])
     e = np.zeros((len(a),1))
-    e[k-1] = 1
+    e[0] = 1
     return a - alfa*e
 
 ''' Not sure if this is usefull
