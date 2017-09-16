@@ -1,21 +1,6 @@
 import numpy as np
 from methods import Householder as hh
-from math import sqrt
-from methods import GS
-
-def qr_Householder(A):
-    n = np.ma.size(A, 0)
-    Q = np.identity(n,dtype=None)
-    original_A = A
-
-    for k in range(1,n):
-        P = hh.k_householder(A,k)
-        A = P.dot(A)
-        Q = Q.dot(P)
-
-    R = Q.transpose().dot(original_A)
-
-    return Q,R
+from methods import GrahamSchmidt as gs
 
 def is_diag(A, error):
     for i in range(len(A)):
@@ -25,19 +10,13 @@ def is_diag(A, error):
     return True
 
 def get_eig(A):
-    #Q, R = householder(A)
-
-    Q, R = GS.gram_schmidt(A)
+    Q, R = gs.qr_Gram_Schmidt(A)
     assert np.allclose(A, Q.dot(R))
-    #A = mult_matrix(R, Q)
     A = R.dot(Q)
     C = Q
 
     while not is_diag(A, 0.00001):
-        #Q, R = householder(A)
-        Q, R = GS.gram_schmidt(A)
-        #A = mult_matrix(R, Q)
-        #C = mult_matrix(C, Q)
+        Q, R = gs.qr_Gram_Schmidt(A)
         assert np.allclose(A, Q.dot(R))
         A = R.dot(Q)
         C = C.dot(Q)

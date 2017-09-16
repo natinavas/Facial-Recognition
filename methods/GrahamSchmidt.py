@@ -1,6 +1,6 @@
 import numpy as np
 
-def gram_schmidt(A):
+def qr_Gram_Schmidt(A):
     """ Gram Schmidt method for obtaining a QR decomposition """
     # http://www.math.ucla.edu/~yanovsky/Teaching/Math151B/handouts/GramSchmidt.pdf
     Q = np.zeros(A.shape)

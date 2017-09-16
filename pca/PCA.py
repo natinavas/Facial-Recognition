@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import scipy.misc
 from PIL import Image
-import qr
+import Eig
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
@@ -43,7 +43,7 @@ covariance_matrix = centered_matrix.dot(centered_matrix.T)
 
 # Calculate eigen values and eigen vectors
 print('Calculating eigen values and eigen vectors')
-eig_values, eig_vectors = qr.get_eig(covariance_matrix)
+eig_values, eig_vectors = Eig.get_eig(covariance_matrix)
 
 
 # Get best eigenvalues
