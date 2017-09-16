@@ -2,7 +2,6 @@ import argparse
 import numpy as np
 import scipy.misc
 from PIL import Image
-
 import qr
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""

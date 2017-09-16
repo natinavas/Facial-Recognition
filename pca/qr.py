@@ -1,9 +1,7 @@
 import numpy as np
-import GS
 from methods import Householder as hh
 from math import sqrt
 from methods import GS
-from methods import qr
 
 def qr_Householder(A):
     n = np.ma.size(A, 0)
@@ -29,7 +27,7 @@ def is_diag(A, error):
 def get_eig(A):
     #Q, R = householder(A)
 
-    Q, R = qr_Householder(A)
+    Q, R = GS.gram_schmidt(A)
     assert np.allclose(A, Q.dot(R))
     #A = mult_matrix(R, Q)
     A = R.dot(Q)
@@ -37,7 +35,7 @@ def get_eig(A):
 
     while not is_diag(A, 0.00001):
         #Q, R = householder(A)
-        Q, R = qr_Householder(A)
+        Q, R = GS.gram_schmidt(A)
         #A = mult_matrix(R, Q)
         #C = mult_matrix(C, Q)
         assert np.allclose(A, Q.dot(R))
