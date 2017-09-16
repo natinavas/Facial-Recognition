@@ -2,8 +2,6 @@ import numpy as np
 from PIL import Image
 import qr
 import argparse
-import GS as gs
-
 import scipy.misc
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
@@ -18,10 +16,10 @@ args = parser.parse_args()
 THRESHOLD = 0.9
 
 #Training set characteristics
-# TODO get from parameters
-TRAINING_SET_SIZE = 5
 # TODO: get from image folder
 AMOUNT_OF_FACES = 5
+# TODO get from parameters
+TRAINING_SET_SIZE = 5
 
 # Load images
 print('Loading images')
@@ -70,13 +68,12 @@ eigen_faces = np.zeros(matrix.shape)
 for face in range(AMOUNT_OF_FACES * TRAINING_SET_SIZE):
     eigen_faces[:, face] = matrix.dot(np.ravel(eig_vectors[:, face]))
 
-
+i = 0
 for face in eigen_faces.T:
+    i+=1
     reshaped_face = np.reshape(face, [112, 92])
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(1, 1)
     axes.imshow(np.reshape(reshaped_face, [112, 92]), cmap='gray')
-    fig.suptitle('Autocara')
-    fig.show()
-    outfile = "outfile" + str(face) + ".pgm"
+    outfile = "outfile" + str(i) + ".pgm"
     scipy.misc.imsave(outfile, reshaped_face)
