@@ -4,6 +4,7 @@ import scipy.misc
 from PIL import Image
 import Eig
 from qr import Householder as hh
+from qr import GrahamSchmidt as gs
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
@@ -48,7 +49,7 @@ print('Calculating eigen values and eigen vectors')
 if args.method == "householder":
     eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
 elif args.method == "gramschmidt":
-    eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
+    eig_values, eig_vectors = Eig.get_eig(covariance_matrix, gs.qr_Gram_Schmidt)
 else:
     raise ValueError("The method is not supported")
 
