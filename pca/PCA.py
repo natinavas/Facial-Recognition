@@ -22,11 +22,11 @@ mean = matrix.mean(axis=1)
 centered_matrix = matrix - mean
 
 #Calculate the covariance matrix
-print('Calculatin Covariance Matrix')
+print('Calculating Covariance Matrix')
 covariance_matrix = centered_matrix.dot(centered_matrix.T)\
 
 # Calculate eigen values and eigen vectors
-print('Calculatin eigen values')
+print('Calculating eigen values')
 eig_values, eig_vectors = qr.get_eig(covariance_matrix)
 
 
