@@ -85,19 +85,21 @@ def is_diag(A, error):
 
 def get_eig(A):
     #Q, R = householder(A)
+
     Q, R = GS.gram_schmidt(A)
+    assert np.allclose(A, Q.dot(R))
     #A = mult_matrix(R, Q)
     A = R.dot(Q)
     C = Q
+
     while not is_diag(A, 0.00001):
         #Q, R = householder(A)
         Q, R = GS.gram_schmidt(A)
         #A = mult_matrix(R, Q)
         #C = mult_matrix(C, Q)
+        assert np.allclose(A, Q.dot(R))
         A = R.dot(Q)
         C = C.dot(Q)
-
-#     R = map(abs, R) eSTO NO SE SI QUEDA EN MASTER
 
     eigvalues = np.diagonal(R)
     # Order the eigenvalues
@@ -105,7 +107,7 @@ def get_eig(A):
     eigvalues = sorted(eigvalues, key=int, reverse=True)
     C = np.matrix(C)
     C = C[:][indices]
-    return C, eigvalues
+    return eigvalues, C
 
 
 #Example
