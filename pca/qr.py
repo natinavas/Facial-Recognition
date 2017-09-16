@@ -3,7 +3,6 @@ from pprint import pprint
 import numpy.linalg as la
 import numpy as np
 import GS
-import qrhh
 
 
 def mult_matrix(M, N):
