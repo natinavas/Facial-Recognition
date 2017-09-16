@@ -3,6 +3,8 @@ from pprint import pprint
 import numpy.linalg as la
 import numpy as np
 import GS
+import qrhh
+
 
 def mult_matrix(M, N):
     """Multiply square matrices of same dimension M and N"""
@@ -94,11 +96,14 @@ def get_eig(A):
         #C = mult_matrix(C, Q)
         A = R.dot(Q)
         C = C.dot(Q)
+
+#     R = map(abs, R) eSTO NO SE SI QUEDA EN MASTER
+
     eigvalues = np.diagonal(R)
+    # Order the eigenvalues
     indices = eigvalues.argsort()[::-1]
     eigvalues = sorted(eigvalues, key=int, reverse=True)
     C = np.matrix(C)
-
     C = C[:][indices]
     return C, eigvalues
 
