@@ -4,17 +4,18 @@ import qr
 THRESHOLD = 0.9
 
 # Load images
-images = list(None for i in range(400))
-for i in range(1,41):
+images = list(None for i in range(20))
+for i in range(1,3):
     for j in range(1,11):
-        dir= "/Users/natinavas/Documents/ITBA/MNA/orl_faces/s"+str(i)+"/"+str(j)+".pgm"
-        print(list(Image.open(dir).getdata()))
+        #dir= "/Users/natinavas/Documents/ITBA/MNA/orl_faces/s"+str(i)+"/"+str(j)+".pgm"
+        dir= "../att_faces/orl_faces/s"+str(i)+"/"+str(j)+".pgm"
+        #print(list(Image.open(dir).getdata()))
         images[(i-1)*10+(j-1)]=list(Image.open(dir).getdata())
 
 # Create matrix out of images
 m = numpy.matrix(images)
-matrix = numpy.transpose(m)
-
+#matrix = numpy.transpose(m)
+matrix = m
 print('2----')
 # print(matrix)
 
@@ -25,16 +26,20 @@ print('3----')
 
 #Calculate the covariance matrix
 #TODO: hacer bien
-covariance_matrix = numpy.cov(centered_matrix)
+#covariance_matrix = numpy.cov(centered_matrix)
+covariance_matrix = centered_matrix.dot(centered_matrix.T)
+print("cov size: ", numpy.size(covariance_matrix))
+
 print('4----')
 
 # Calculate eigen values
 #TODO: hacer bien
 #OBS: se esta asumiendo que los eigen values estan ordenados.
-eig_values, eig_vectors = numpy.linalg.eig(covariance_matrix)
+#cov_m = numpy.asarray(covariance_matrix)
+#eig_values, eig_vectors = numpy.linalg.eig(cov_m)
 
 #Custom eig with QR (householder). eig values returned in descending order
-#eig_values, eig_vectors = qr.get_eig(covariance_matrix)
+eig_values, eig_vectors = qr.get_eig(covariance_matrix)
 print('5----')
 
 # Get best eigenvalues
@@ -51,3 +56,4 @@ print('7----')
 projected_values = numpy.transpose(centered_matrix)*best_eig_vectors
 
 #print(projected_values)
+

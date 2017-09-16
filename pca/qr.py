@@ -2,6 +2,7 @@ from math import sqrt
 from pprint import pprint
 import numpy.linalg as la
 import numpy as np
+import GS
 
 def mult_matrix(M, N):
     """Multiply square matrices of same dimension M and N"""
@@ -81,13 +82,18 @@ def is_diag(A, error):
     return True
 
 def get_eig(A):
-    Q, R = householder(A)
-    A = mult_matrix(R, Q)
+    #Q, R = householder(A)
+    Q, R = GS.gram_schmidt(A)
+    #A = mult_matrix(R, Q)
+    A = R.dot(Q)
     C = Q
-    while not is_diag(A, 0.0000001):
-        Q, R = householder(A)
-        A = mult_matrix(R, Q)
-        C = mult_matrix(C, Q)
+    while not is_diag(A, 0.00001):
+        #Q, R = householder(A)
+        Q, R = GS.gram_schmidt(A)
+        #A = mult_matrix(R, Q)
+        #C = mult_matrix(C, Q)
+        A = R.dot(Q)
+        C = C.dot(Q)
     eigvalues = np.diagonal(R)
     indices = eigvalues.argsort()[::-1]
     eigvalues = sorted(eigvalues, key=int, reverse=True)
