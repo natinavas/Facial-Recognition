@@ -1,6 +1,6 @@
 import numpy as np
-from methods import Householder as hh
-from methods import GrahamSchmidt as gs
+from qr import Householder as hh
+from qr import GrahamSchmidt as gs
 
 def is_diag(A, error):
     for i in range(len(A)):

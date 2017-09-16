@@ -3,7 +3,7 @@ import numpy as np
 import scipy.misc
 from PIL import Image
 import Eig
-from methods import Householder as hh
+from qr import Householder as hh
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
