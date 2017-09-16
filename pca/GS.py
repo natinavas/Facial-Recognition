@@ -2,6 +2,7 @@ import numpy as np
 
 def gram_schmidt(A):
     """ Gram Schmidt method for obtaining a QR decomposition """
+    # http://www.math.ucla.edu/~yanovsky/Teaching/Math151B/handouts/GramSchmidt.pdf
     Q = np.zeros(A.shape)
     R = np.zeros(A.shape)
     u = np.zeros(A.shape)

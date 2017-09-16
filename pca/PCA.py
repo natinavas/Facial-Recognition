@@ -4,6 +4,7 @@ import qr
 THRESHOLD = 0.9
 
 # Load images
+print('Loading Images')
 images = list(None for i in range(20))
 for i in range(1,3):
     for j in range(1,11):
@@ -14,49 +15,33 @@ for i in range(1,3):
         images[(i-1)*10+(j-1)]=list(Image.open(dir).getdata())
 
 # Create matrix out of images
-m = np.matrix(images)
-#matrix = np.transpose(m)
-matrix = m
-print('2----')
-# print(matrix)
+matrix = np.matrix(images)
 
 #Calculate mean for rows
 mean = matrix.mean(axis=1)
 centered_matrix = matrix - mean
-print('3----')
 
 #Calculate the covariance matrix
-#TODO: hacer bien
-#covariance_matrix = np.cov(centered_matrix)
-covariance_matrix = centered_matrix.dot(centered_matrix.T)
-print("cov size: ", np.size(covariance_matrix))
+print('Calculatin Covariance Matrix')
+covariance_matrix = centered_matrix.dot(centered_matrix.T)\
 
-print('4----')
-
-# Calculate eigen values
-#TODO: hacer bien
-#OBS: se esta asumiendo que los eigen values estan ordenados.
-#cov_m = np.asarray(covariance_matrix)
-#eig_values, eig_vectors = np.linalg.eig(cov_m)
-
-#Custom eig with QR (householder). eig values returned in descending order
+# Calculate eigen values and eigen vectors
+print('Calculatin eigen values')
 eig_values, eig_vectors = qr.get_eig(covariance_matrix)
 
-print('5----')
 
 # Get best eigenvalues
+print('Get representative eigen values')
 sum_eig_values = sum(eig_values)
 actual_sum = 0
-
 i = 0
-print('6----')
 while(actual_sum/sum_eig_values < THRESHOLD):
     actual_sum += eig_values[i]
     i+=1
 best_eig_vectors = eig_vectors[:, 0:i]
-print('7----')
+
 # Project values on eigen vectors
+print('Project values on eigen vectors')
 projected_values = np.transpose(centered_matrix)*best_eig_vectors
 
-#print(projected_values)
 
