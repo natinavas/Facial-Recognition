@@ -21,11 +21,11 @@ THRESHOLD = 0.9
 # TODO get from parameters
 TRAINING_SET_SIZE = 5
 # TODO: get from image folder
-AMOUNT_OF_FACES = 3
+AMOUNT_OF_FACES = 5
 
 # Load images
 print('Loading images')
-images = list(None for i in range(15))
+images = list(None for i in range(TRAINING_SET_SIZE * AMOUNT_OF_FACES))
 for i in range(1,AMOUNT_OF_FACES + 1):
     for j in range(1,TRAINING_SET_SIZE + 1):
         dir= args.images +str(i)+"/"+str(j)+ args.image_type
@@ -67,8 +67,9 @@ projected_values = np.transpose(centered_matrix)*best_eig_vectors
 matrix = matrix.T
 eigen_faces = np.zeros(matrix.shape)
 
-for face in range(AMOUNT_OF_FACES):
+for face in range(AMOUNT_OF_FACES * TRAINING_SET_SIZE):
     eigen_faces[:, face] = matrix.dot(np.ravel(eig_vectors[:, face]))
+
 
 for face in eigen_faces.T:
     reshaped_face = np.reshape(face, [112, 92])
