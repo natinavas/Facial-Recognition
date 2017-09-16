@@ -9,14 +9,14 @@ def is_diag(A, error):
                 return False
     return True
 
-def get_eig(A):
-    Q, R = gs.qr_Gram_Schmidt(A)
+def get_eig(A, eig_method):
+    Q, R = eig_method(A)
     assert np.allclose(A, Q.dot(R))
     A = R.dot(Q)
     C = Q
 
     while not is_diag(A, 0.00001):
-        Q, R = gs.qr_Gram_Schmidt(A)
+        Q, R = eig_method(A)
         assert np.allclose(A, Q.dot(R))
         A = R.dot(Q)
         C = C.dot(Q)

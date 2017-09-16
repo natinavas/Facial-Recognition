@@ -3,6 +3,7 @@ import numpy as np
 import scipy.misc
 from PIL import Image
 import Eig
+from methods import Householder as hh
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
@@ -12,6 +13,7 @@ parser = argparse.ArgumentParser(description='Facial Recognition software with P
 parser.add_argument('--images', '-i', type=str, default=DEFAULT_PATH, dest="images")
 parser.add_argument('--image_type', '-it', type=str, default='.pgm', dest="image_type")
 parser.add_argument('--training_set_size', '-tss', type=int, dest="training_set_size")
+parser.add_argument('--eig_method', '-em', type=str, dest="method", default="householder")
 args = parser.parse_args()
 THRESHOLD = 0.9
 
@@ -43,8 +45,12 @@ covariance_matrix = centered_matrix.dot(centered_matrix.T)
 
 # Calculate eigen values and eigen vectors
 print('Calculating eigen values and eigen vectors')
-eig_values, eig_vectors = Eig.get_eig(covariance_matrix)
-
+if args.method == "householder":
+    eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
+elif args.method == "gramschmidt":
+    eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
+else:
+    raise ValueError("The method is not supported")
 
 # Get best eigenvalues
 print('Getting representative eigen values')
