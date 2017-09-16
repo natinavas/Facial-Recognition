@@ -99,7 +99,6 @@ def get_eig(A):
         assert np.allclose(A, Q.dot(R))
         A = R.dot(Q)
         C = C.dot(Q)
-
     eigvalues = np.diagonal(R)
     # Order the eigenvalues
     indices = eigvalues.argsort()[::-1]
