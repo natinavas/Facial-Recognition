@@ -13,16 +13,19 @@ DEFAULT_PATH = "../att_faces/s"
 parser = argparse.ArgumentParser(description='Facial Recognition software with PCA')
 parser.add_argument('--images', '-i', type=str, default=DEFAULT_PATH, dest="images")
 parser.add_argument('--image_type', '-it', type=str, default='.pgm', dest="image_type")
-parser.add_argument('--training_set_size', '-tss', type=int, dest="training_set_size")
+parser.add_argument('--training_set_size', '-tss', type=int, default=5, dest="training_set_size")
 parser.add_argument('--eig_method', '-em', type=str, dest="method", default="householder")
 args = parser.parse_args()
 THRESHOLD = 0.9
 
+# Check parameters
+if not args.method == "householder" and not args.method == "gramschmidt":
+    raise ValueError("Eigen method is not supported, choose householder or gramschmidt")
+
 #Training set characteristics
 # TODO: get from image folder
 AMOUNT_OF_FACES = 5
-# TODO get from parameters
-TRAINING_SET_SIZE = 5
+TRAINING_SET_SIZE = args.training_set_size
 
 # Load images
 print('Loading images')
