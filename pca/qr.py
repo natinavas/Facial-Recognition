@@ -2,7 +2,9 @@ from math import sqrt
 from pprint import pprint
 import numpy.linalg as la
 import numpy as np
+import GS
 import qrhh
+
 
 def mult_matrix(M, N):
     """Multiply square matrices of same dimension M and N"""
@@ -82,19 +84,21 @@ def is_diag(A, error):
     return True
 
 def get_eig(A):
-    Q, R = np.linalg.qr(A)
-    A = np.multiply(R, Q)
+    #Q, R = householder(A)
+    Q, R = GS.gram_schmidt(A)
+    #A = mult_matrix(R, Q)
+    A = R.dot(Q)
     C = Q
-    # Multiply the matrices while A is not diagonal
-    while not is_diag(A, 0.001):
-        #Q, R = np.linalg.qr(A)
-        Q, R = qrhh.QRHH(A)
-        A = np.multiply(R, Q)
-        C = np.multiply(C, Q)
-    # Get the absolute values of R, so that when sorting it does
-    # it according to the absolute value
-    R = map(abs, R)
-    # Get the diagonal of R that has the eigenvalues
+    while not is_diag(A, 0.00001):
+        #Q, R = householder(A)
+        Q, R = GS.gram_schmidt(A)
+        #A = mult_matrix(R, Q)
+        #C = mult_matrix(C, Q)
+        A = R.dot(Q)
+        C = C.dot(Q)
+
+#     R = map(abs, R) eSTO NO SE SI QUEDA EN MASTER
+
     eigvalues = np.diagonal(R)
     # Order the eigenvalues
     indices = eigvalues.argsort()[::-1]
