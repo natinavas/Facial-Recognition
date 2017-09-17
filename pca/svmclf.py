@@ -15,13 +15,18 @@ def svmclassify(training_set, training_class, testing_set, testing_class, verbos
 
     #Number of classes for effectiveness analysis
     classCount = len(set(training_class))
-
+    if(verbose==1):
+        print("classCount = {}".format(classCount))
     #Setting up classifier
-    clf = svm.SVC()
+    clf = svm.LinearSVC()
 
     #Training classifier with provided data set+group
     clf.fit(training_set, training_class)
 
+    classifications = clf.score(testing_set, testing_class)
+
+    print ("classifications", classifications)
+    testing_class #
     #Setup for control
     check, error = 0 , 0
     error_matrix = np.zeros((classCount,classCount))
@@ -41,5 +46,3 @@ def svmclassify(training_set, training_class, testing_set, testing_class, verbos
             error+=1
 
     return (check, error, error_matrix)
-
-

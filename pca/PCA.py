@@ -4,6 +4,7 @@ import scipy.misc
 from PIL import Image
 import Eig
 import svmclf
+import eucclass
 from qr import Householder as hh
 from qr import GrahamSchmidt as gs
 import matplotlib.pyplot as plt
@@ -19,7 +20,6 @@ parser.add_argument('--eig_method', '-em', type=str, dest="method", default="hou
 parser.add_argument('--verbose', '-v', type=bool, default=True, dest="verbose")
 args = parser.parse_args()
 THRESHOLD = 0.9
-
 
 # Check parameters
 if not args.method == "householder" and not args.method == "gramschmidt":
@@ -45,16 +45,26 @@ matrix = (np.matrix(images)).T
 # Calculate mean different faces
 mean = matrix.mean(axis=1)
 
+#TODO guardar mean menos kbezamente
+mean_face = np.reshape(mean, [112, 92])
+# fig, axes = plt.subplots(1, 1)
+# axes.imshow(np.reshape(reshaped_face, [112, 92]), cmap='gray')
+outfile = "outfilemean" + ".pgm"
+scipy.misc.imsave(outfile, mean_face)
+
 # Divide by standard deviation
 # standard_deviation = np.std(matrix, axis=1)
 standard_deviation = 1 #TODO
-centered_matrix = (matrix - mean)/standard_deviation
 
+# TODO
+centered_matrix = (matrix - mean)/standard_deviation
+# centered_matrix = matrix
 # Calculate the covariance matrix
 # Calculate centered matrix * transposed centered matrix to get a
 # similar matrix to the one of the covariance
 if(args.verbose):
     print('Calculating covariance matrix')
+
 covariance_matrix = (centered_matrix.T).dot(centered_matrix)
 
 # Calculate eigen values and eigen vectors
@@ -82,9 +92,8 @@ best_eig_vectors = eig_vectors[:, 0:i]
 
 # Calculate images
 # http://blog.manfredas.com/eigenfaces-tutorial/
-eigen_faces = np.zeros((len(centered_matrix), len(best_eig_vectors)))
+#eigen_faces = np.zeros((len(centered_matrix), len(best_eig_vectors)))
 
-# TODO: hacer con best y no con todos
 # for face in range(len(best_eig_vectors)):
 #     eigen_faces[:, face] = centered_matrix.dot(np.ravel(best_eig_vectors[face, :]))
 eigen_faces = centered_matrix.dot(best_eig_vectors)
@@ -92,7 +101,7 @@ eigen_faces = centered_matrix.dot(best_eig_vectors)
 # Project values on eigen vectors
 if(args.verbose):
     print('Projecting values on eigen vectors')
-projected_values = eigen_faces.T*centered_matrix
+projected_values = eigen_faces.T.dot(centered_matrix)
 
 # Write image files
 i = 0
@@ -112,9 +121,13 @@ for i in range(1,AMOUNT_OF_FACES + 1):
     dir= args.images +str(i)+"/"+str(6)+ args.image_type
     test_images[(i-1)]=list(Image.open(dir).getdata())
 
-testing_set = np.matrix(test_images).dot(eigen_faces)
+
+test_matrix = np.matrix(test_images).T
+test_matrix = test_matrix - mean
+
+testing_set = eigen_faces.T.dot(test_matrix)
 
 training_classes = [1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5]
 testing_classes = [1,2,3,4,5]
 
-svmclf.svmclassify(training_set=projected_values.T, training_class=training_classes, testing_set=testing_set, testing_class=testing_classes)
+svmclf.svmclassify(training_set=projected_values.T, training_class=training_classes, testing_set=testing_set.T, testing_class=testing_classes)
