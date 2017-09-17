@@ -1,53 +1,45 @@
 import numpy as np
 from sklearn import svm
 
-def svmclassify(trainingSet, trainingClass,testingSet, testingClass, verbose):
+def svmclassify(training_set, training_class, testing_set, testing_class, verbose=True):
 
     #safeChecks
-    if (len(trainingSet)!=len(trainingClass) or  len(testingSet)!=len(testingClass)):
-        #TODO pulir esto jeje
-        print "invalid classification data"
+    if len(training_set)!=len(training_class):
+        raise ValueError("The training set and training class must have the same length, "
+                         "training set has a length of %d and training class has a length of %d"
+                         %(len(training_set), len(training_class)))
+    if len(testing_set)!=len(testing_class):
+        raise ValueError("The testing set and testing class must have the same length, "
+                         "testing set has a length of %d and testing class has a length of %d"
+                         %(len(testing_set), len(testing_class)))
 
     #Number of classes for effectiveness analysis
-    classCount = len(set(trainingClass))
+    classCount = len(set(training_class))
 
     #Setting up classifier
-    clf = svm.SVC(gamma=0.001, C=100)
+    clf = svm.SVC()
 
     #Training classifier with provided data set+group
-    clf.fit(trainingSet,trainingClass)
+    clf.fit(training_set, training_class)
 
     #Setup for control
     check, error = 0 , 0
     error_matrix = np.zeros((classCount,classCount))
 
     #For each testing element
-    for i in range (len(testingSet)):
-        #Get prediction
-        prediction = clf.predict([testingSet[i]])
+    for i in range (len(testing_set)):
 
-        error_matrix[testingClass[i]-1,prediction-1]+=1
+        #Get prediction
+        prediction = clf.predict(testing_set[i])
+
+        error_matrix[testing_class[i] - 1, prediction - 1]+=1
         if (verbose==1):
-            print ("Predicting item {} , {} as {}".format(i,testingClass[i],prediction))
-        if ( testingClass[i] == prediction):
+            print ("Predicting item {} , {} as {}".format(i, testing_class[i], prediction))
+        if (testing_class[i] == prediction):
             check+=1
         else:
             error+=1
 
     return (check, error, error_matrix)
-
-trGroup = np.array([1,1,1,2,2,2,3,3,3])
-trSet=np.array([[1,1],[2,2],[1,1],[11,11],[12,12],[13,13],[45,45],[43,43],[44,44]])
-
-testGroup= np.array([1,3,2])
-testSet=np.array([[1,1],[44,44],[15,15]])
-
-v = 1
-
-right, wrong, matrix = svmclassify(trSet, trGroup, testSet, testGroup, v)
-
-print("{} % correct predictions".format(right*100/(right+wrong)))
-
-print(matrix)
 
 
