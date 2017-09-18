@@ -13,7 +13,7 @@ def get_eig(A, eig_method):
     """ Method used to calculate eigen vectors and eigen values"""
     Q, R = eig_method(A)
     resta = np.subtract(A, Q.dot(R))
-    assert np.allclose(A, Q.dot(R))
+    # assert np.allclose(A, Q.dot(R))
     A = R.dot(Q)
     C = Q
     # Iterate until the matrix obtained is a diagonal matrix

@@ -15,9 +15,10 @@ import matplotlib.pyplot as plt
 parser = argparse.ArgumentParser(description='Facial Recognition software with PCA')
 parser.add_argument('--images', '-i', type=str, default="../att_faces/s", dest="images")
 parser.add_argument('--image_type', '-it', type=str, default='.pgm', dest="image_type")
-parser.add_argument('--training_set_size', '-tss', type=int, default=5, dest="training_set_size")
+parser.add_argument('--training_set_size', '-tss', type=int, default=6, dest="training_set_size")
 parser.add_argument('--eig_method', '-em', type=str, dest="method", default="householder")
 parser.add_argument('--verbose', '-v', type=bool, default=True, dest="verbose")
+parser.add_argument('--type', '-t', type=str, default="lineal", dest="type")
 args = parser.parse_args()
 THRESHOLD = 0.9
 
@@ -27,8 +28,10 @@ if not args.method == "householder" and not args.method == "gramschmidt":
 
 #Training set characteristics
 # TODO: get from image folder
-AMOUNT_OF_FACES = 5
+AMOUNT_OF_FACES = 40
 TRAINING_SET_SIZE = args.training_set_size
+training_classes=np.zeros(AMOUNT_OF_FACES*TRAINING_SET_SIZE)
+
 
 # Load images
 if(args.verbose):
@@ -38,9 +41,10 @@ for i in range(1,AMOUNT_OF_FACES + 1):
     for j in range(1,TRAINING_SET_SIZE + 1):
         dir= args.images +str(i)+"/"+str(j)+ args.image_type
         images[(i-1)*TRAINING_SET_SIZE+(j-1)]=list(Image.open(dir).getdata())
+        training_classes[(i-1)*TRAINING_SET_SIZE+(j-1)]=i
 
 # Create matrix out of images
-matrix = (np.matrix(images)).T
+matrix = (np.matrix(images)).T/255
 
 # Calculate mean different faces
 mean = matrix.mean(axis=1)
@@ -72,10 +76,10 @@ if(args.verbose):
     print('Calculating eigen values and eigen vectors')
 if args.method == "householder":
     eig_values, eig_vectors = np.linalg.eig(covariance_matrix)
-    # eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
+    #eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
 elif args.method == "gramschmidt":
-    eig_values, eig_vectors = np.linalg.eig(covariance_matrix)
-    # eig_values, eig_vectors = Eig.get_eig(covariance_matrix, gs.qr_Gram_Schmidt)
+    # eig_values, eig_vectors = np.linalg.eig(covariance_matrix)
+    eig_values, eig_vectors = Eig.get_eig(covariance_matrix, gs.qr_Gram_Schmidt)
 else:
     raise ValueError("The method is not supported")
 
@@ -116,18 +120,23 @@ for face in eigen_faces.T:
 # Load test images
 if(args.verbose):
     print('Loading testing images')
-test_images = list(None for i in range(AMOUNT_OF_FACES))
+test_images = list(None for i in range(AMOUNT_OF_FACES*(10-TRAINING_SET_SIZE)))
+
+testing_class= np.zeros(AMOUNT_OF_FACES*(10-TRAINING_SET_SIZE))
 for i in range(1,AMOUNT_OF_FACES + 1):
-    dir= args.images +str(i)+"/"+str(6)+ args.image_type
-    test_images[(i-1)]=list(Image.open(dir).getdata())
+    for j in range(TRAINING_SET_SIZE+1,11):
+        dir= args.images +str(i)+"/"+str(j)+ args.image_type
+        print("i {} j {} index {}".format(i,j,(i-1)*(10-TRAINING_SET_SIZE)+(j- TRAINING_SET_SIZE)))
+        test_images[(i-1)*(10-TRAINING_SET_SIZE)+(j- TRAINING_SET_SIZE)-1]=list(Image.open(dir).getdata())
+        testing_class[(i-1)*(10-TRAINING_SET_SIZE)+(j-TRAINING_SET_SIZE)-1]=i
 
-
-test_matrix = np.matrix(test_images).T
+test_matrix = np.matrix(test_images).T/255
 test_matrix = test_matrix - mean
 
 testing_set = eigen_faces.T.dot(test_matrix)
 
-training_classes = [1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5]
-testing_classes = [1,2,3,4,5]
 
-svmclf.svmclassify(training_set=projected_values.T, training_class=training_classes, testing_set=testing_set.T, testing_class=testing_classes)
+#training_classes = [1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5]
+
+
+svmclf.svmclassify(training_set=projected_values.T, training_class=training_classes, testing_set=testing_set.T, testing_class=testing_class)
