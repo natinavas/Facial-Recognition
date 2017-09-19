@@ -5,7 +5,7 @@ def hessenberg_matrix(M):
     H = M
     T = np.identity(n, dtype=None)
     for i in xrange(n-2):
-        P = k_householder_reflection(M,i+1)
+        P = k_householder_reflection(H,i+1)
         H = P.dot(H).dot(P)
         T = T.dot(P)
     return H,T
