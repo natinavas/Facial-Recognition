@@ -20,7 +20,7 @@ def k_householder_reflection(M,k):
 def calculate_S(X,k):
     last = X[k:,:]
     squared = list(map(lambda x: x ** 2, last))
-    return np.math.sqrt(reduce((lambda x,y: x+y), squared))
+    return np.math.sqrt(reduce((lambda x,y: x+y), squared))*np.sign(X[k])
 
 def calculate_R(X,k):
     last = X[k:, :]
