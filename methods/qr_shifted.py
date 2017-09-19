@@ -4,44 +4,30 @@ import hessenberg as hess
 # Assumes that M matrix is symmetric
 def eig_qr_shifted(M, qr_method):
     n = np.ma.size(M, 0)
-    M,t = hess.hessenberg_matrix(M)
-    B = M
+    H, t = hess.hessenberg_matrix(M)
+    B = H
+    eigvec = np.identity(n, dtype=None)
     n -= 1
-    error = 0.00001
+    error = 0.00000001
 
     while n > 0:
         I = np.identity(n+1, dtype=None)
         while np.abs(B[n,n-1]) >= error:
             s = shift(B[n-1,n-1],B[n,n],B[n-1,n])
             Q,R = qr_method(B - s*I)
+
+            #adapt Q to original size
+            i = np.identity(np.ma.size(M, 0), dtype=None)
+            i[0:n+1,0:n+1] = Q
+            eigvec = eigvec.dot(i)
+
             B = R.dot(Q) + s*I
-        M[0:n+1,0:n+1] = B
-        n-= 1
-        B = M[0:n+1,0:n+1]
 
-    return np.diag(M)
+        H[0:n + 1, 0:n + 1] = B
+        n -= 1
+        B = H[0:n + 1, 0:n + 1]
 
-
-# def eig_qr_shifted_rec(M, qr_method):
-#     n = np.ma.size(M, 0)
-#     eigval = np.zeros((1, n))
-#     error = 0.00001
-#
-#     if n == 1:
-#         eigval[0,0] = M[0,0]
-#     else:
-#         I = np.identity(n, dtype=None)
-#         H,t = hess.hessenberg_matrix(M)
-#
-#         while np.abs(H[n-1,n-2]) > error:
-#             mu = shift(H[n-2,n-2],H[n-1,n-1],H[n-2,n-1])
-#             Q,R = qr_method(H - mu*I)
-#             H = R.dot(Q) + mu*I
-#
-#         eigval[0,n-1] = H[n-1,n-1]
-#         eigval[0,0:n-1] = eig_qr_shifted_rec(H[0:n-1,0:n-1],qr_method)
-#
-#     return eigval
+    return np.diag(H), t.dot(eigvec)
 
 
 def shift(a,b,c):
