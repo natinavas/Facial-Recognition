@@ -8,9 +8,13 @@ def eig_qr_shifted(M, qr_method):
     B = H
     eigvec = np.identity(n, dtype=None)
     n -= 1
-    error = 0.00000001
+    bigError = 0.1
+    miniError = 0.00000001
+    error = bigError
 
     while n > 0:
+        if n <= (1.*np.ma.size(M, 0)/2.):
+            error = miniError
         I = np.identity(n+1, dtype=None)
         while np.abs(B[n,n-1]) >= error:
             s = shift(B[n-1,n-1],B[n,n],B[n-1,n])
