@@ -1,7 +1,7 @@
 import numpy as np
 
 def kernel_matrix(M,kernel_method):
-    K = M - M
+    K = M - M #TODO esto es un asco barto
 
     for row in range(M.shape[0]):
         for col in range(M.shape[1]):
