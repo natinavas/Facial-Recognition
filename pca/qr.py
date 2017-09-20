@@ -1,5 +1,7 @@
 import numpy as np
 
+from methods import hessenberg as hess
+
 def is_diag(A, error):
     """ Check if a matrix only haves ceros or numbers
     smaller than error under the diagonal"""
@@ -25,10 +27,10 @@ def eig_qr(A, qr_method):
     eigvalues = np.diagonal(R)
 
     # Order the eigenvalues
-    indices = eigvalues.argsort()[::-1]
-    eigvalues = sorted(eigvalues, key=int, reverse=True)
+    indices = sorted(range(len(eigvalues)), reverse=True, key=lambda x: abs(eigvalues[x]))
+    eigvalues = sorted(eigvalues, key=abs, reverse=True)
     C = np.matrix(C)
-    C = C[:][indices]
+    C = C[:,indices]
     return eigvalues, C
 
 # Assumes that M matrix is symmetric

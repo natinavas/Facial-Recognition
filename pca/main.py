@@ -1,22 +1,33 @@
 import numpy as np
-
-import qr
 from classification import svmclf
+from kpca import kernel
+from pca import qr
+from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
 from utils import Parser as arguments
+from methods import Householder as hh
+from methods import GrahamSchmidt as gs
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
-def calculate_eigen(qr_method, eig_method):
-    # TODO agregar eig_method de qr shifted
-    if qr_method == "householder":
-        from methods import Householder as hh
-        eig_values, eig_vectors = qr.eig_qr(covariance_matrix, hh.qr_Householder)
-    elif qr_method== "gramschmidt":
-        from methods import GrahamSchmidt as gs
-        eig_values, eig_vectors = qr.eig_qr(covariance_matrix, gs.qr_Gram_Schmidt)
+def calculate_eigen(matrix, qr_method, eig_method):
+    if(eig_method == "qr"):
+        if qr_method == "householder":
+            eig_values, eig_vectors = eig_qr(matrix, hh.qr_Householder)
+        elif qr_method== "gramschmidt":
+            eig_values, eig_vectors = qr.eig_qr(matrix, gs.qr_Gram_Schmidt)
+        else:
+            raise ValueError("The method is not supported")
+    elif(eig_method == "qr_shifted"):
+        if qr_method == "householder":
+            eig_values, eig_vectors = eig_qr_shifted(matrix, hh.qr_Householder)
+        elif qr_method== "gramschmidt":
+            eig_values, eig_vectors = eig_qr_shifted(matrix, gs.qr_Gram_Schmidt)
+        else:
+            raise ValueError("The method is not supported")
     else:
         raise ValueError("The method is not supported")
+
     return eig_values, eig_vectors
 
 def best_eig_vectors(eig_values, eig_vectors, threshold):
@@ -29,13 +40,22 @@ def best_eig_vectors(eig_values, eig_vectors, threshold):
     best = eig_vectors[:, 0:i]
     return best
 
+def calculate_kernel_eigen(matrix, eig_method, qr_method):
+    K = kernel.kernel_matrix(matrix, kernel.polynomial)
+    eig_values, eig_vectors = calculate_eigen(matrix=K, eig_method=eig_method, qr_method=qr_method)
+    sqrt_eig_values = map(lambda x: np.sqrt(np.abs(x)), eig_values)
+    for i in xrange(len(eig_values)):
+        eig_vectors[:, i] /= sqrt_eig_values[i]
+    return eig_values, eig_vectors
+
+
 ##########
 
 THRESHOLD = 0.95 # Proportion of representation when choosing the best eigen vectors
 
 args = arguments.get_arguments()
 
-#Training set characteristics
+# Training set characteristics
 TRAINING_INDIVIDUALS = 40 #Amount of different individuals that will be classified
 TRAINING_SET_SIZE = args.training_set_size #Amount of training images for each individual
 
@@ -71,7 +91,12 @@ covariance_matrix = (centered_matrix.T).dot(centered_matrix)
 # Calculate eigen values and eigen vectors
 if (args.verbose):
     print('Calculating eigen values and eigen vectors')
-eig_values, eig_vectors = calculate_eigen(args.qr_method, args.eig_method)
+if args.type == "pca":
+    eig_values, eig_vectors = calculate_eigen(matrix=covariance_matrix, qr_method=args.qr_method, eig_method=args.eig_method)
+elif args.type == "kpca":
+    eig_values, eig_vectors = calculate_kernel_eigen(matrix=covariance_matrix, qr_method=args.qr_method, eig_method=args.eig_method)
+else:
+    raise ValueError("The type is not supported")
 
 # Get best eigenvalues
 if(args.verbose):

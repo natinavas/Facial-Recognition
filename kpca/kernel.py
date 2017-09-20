@@ -1,11 +1,11 @@
 import numpy as np
 
 def kernel_matrix(M,kernel_method):
-    K = np.zeros(M.shape)
+    K = M - M
 
-    for row in xrange(M.shape[0]):
-        for col in xrange(M.shape[1]):
-            K[row][col] = kernel_method(M[row,:],M[:,col])
+    for row in range(M.shape[0]):
+        for col in range(M.shape[1]):
+            K[row,col] = kernel_method(M[row,:],M[:,col])
 
     return center_k_matrix(K)
 

@@ -17,5 +17,7 @@ def get_arguments():
         raise ValueError("Qr decomposition method is not supported, choose householder or gramschmidt")
     if not args.eig_method == "qr" and not args.eig_method == "qr_shifted":
         raise ValueError("Eigen method is not supported, choose qr or qr_shifted")
+    if not args.type == "pca" and not args.type == "kpca":
+        raise ValueError("Pca type is not supported, choose pca or kpca")
 
     return args
