@@ -44,7 +44,7 @@ for i in range(1,AMOUNT_OF_FACES + 1):
         training_classes[(i-1)*TRAINING_SET_SIZE+(j-1)]=i
 
 # Create matrix out of images
-matrix = (np.matrix(images)).T/255
+matrix = (np.matrix(images)).T/255.
 
 # Calculate mean different faces
 mean = matrix.mean(axis=1)
@@ -130,7 +130,7 @@ for i in range(1,AMOUNT_OF_FACES + 1):
         test_images[(i-1)*(10-TRAINING_SET_SIZE)+(j- TRAINING_SET_SIZE)-1]=list(Image.open(dir).getdata())
         testing_class[(i-1)*(10-TRAINING_SET_SIZE)+(j-TRAINING_SET_SIZE)-1]=i
 
-test_matrix = np.matrix(test_images).T/255
+test_matrix = np.matrix(test_images).T/255.
 test_matrix = test_matrix - mean
 
 testing_set = eigen_faces.T.dot(test_matrix)
