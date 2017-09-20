@@ -1,27 +1,20 @@
-import argparse
 import numpy as np
-import scipy.misc
-from PIL import Image
-import Eig
-import svmclf
-import eucclass
-from qr import Householder as hh
-from qr import GrahamSchmidt as gs
-import matplotlib.pyplot as plt
 
-from utils import Parser as arguments
+import qr
+from classification import svmclf
 from utils import ImageHandler as imageHandler
+from utils import Parser as arguments
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
-# TODO: agregar parametros despues de cambiarle los nombres a lo que dijo barto
-def calculate_eigen():
-    if args.method == "householder":
-        eig_values, eig_vectors = np.linalg.eig(covariance_matrix)
-        # eig_values, eig_vectors = Eig.get_eig(covariance_matrix, hh.qr_Householder)
-    elif args.method == "gramschmidt":
-        # eig_values, eig_vectors = np.linalg.eig(covariance_matrix)
-        eig_values, eig_vectors = Eig.get_eig(covariance_matrix, gs.qr_Gram_Schmidt)
+def calculate_eigen(qr_method, eig_method):
+    # TODO agregar eig_method de qr shifted
+    if qr_method == "householder":
+        from methods import Householder as hh
+        eig_values, eig_vectors = qr.eig_qr(covariance_matrix, hh.qr_Householder)
+    elif qr_method== "gramschmidt":
+        from methods import GrahamSchmidt as gs
+        eig_values, eig_vectors = qr.eig_qr(covariance_matrix, gs.qr_Gram_Schmidt)
     else:
         raise ValueError("The method is not supported")
     return eig_values, eig_vectors
@@ -38,22 +31,27 @@ def best_eig_vectors(eig_values, eig_vectors, threshold):
 
 ##########
 
-THRESHOLD = 0.9
+THRESHOLD = 0.95 # Proportion of representation when choosing the best eigen vectors
 
 args = arguments.get_arguments()
 
 #Training set characteristics
-AMOUNT_OF_FACES = 40 #Amount of different individuals that will be classified
+TRAINING_INDIVIDUALS = 40 #Amount of different individuals that will be classified
 TRAINING_SET_SIZE = args.training_set_size #Amount of training images for each individual
+
+# Testing set characteristics
+TESTING_SET_SIZE = args.testing_set_size
+TESTING_INDIVIDUALS = TRAINING_INDIVIDUALS #TODO poner por parametros ambos y con las excepciones correspondientes
 
 # Load images
 if (args.verbose):
     print('Loading images')
-images, training_classes = imageHandler.load_training_images(individual_count=AMOUNT_OF_FACES, training_size=TRAINING_SET_SIZE,
-                                              image_dir=args.images, image_type=args.image_type)
+images, training_classes = imageHandler.load_training_images(individual_count=TRAINING_INDIVIDUALS, training_size=TRAINING_SET_SIZE,
+                                                             image_dir=args.images, image_type=args.image_type)
 
 # Create matrix out of images
-matrix = (np.matrix(images)).T/255.
+matrix = (np.matrix(images)).T
+# matrix = (np.matrix(images)).T/255.
 
 # Calculate mean different faces
 mean = matrix.mean(axis=1)
@@ -73,7 +71,7 @@ covariance_matrix = (centered_matrix.T).dot(centered_matrix)
 # Calculate eigen values and eigen vectors
 if (args.verbose):
     print('Calculating eigen values and eigen vectors')
-eig_values, eig_vectors = calculate_eigen()
+eig_values, eig_vectors = calculate_eigen(args.qr_method, args.eig_method)
 
 # Get best eigenvalues
 if(args.verbose):
@@ -95,14 +93,13 @@ imageHandler.save_images(images=eigen_faces.T)
 # Load test images
 if(args.verbose):
     print('Loading testing images')
-test_images, testing_class = imageHandler.load_testing_images(individual_count=AMOUNT_OF_FACES, training_size=TRAINING_SET_SIZE, image_dir=args.images, image_type=args.image_type)
+test_images, testing_class = imageHandler.load_testing_images(individual_count=TESTING_INDIVIDUALS, testing_size=TESTING_SET_SIZE, image_dir=args.images, image_type=args.image_type)
 
 # Generate matrices from loaded images
-test_matrix = np.matrix(test_images).T/255.
+test_matrix = np.matrix(test_images).T
+# test_matrix = np.matrix(test_images).T/255.
 test_matrix = test_matrix - mean
 
 testing_set = eigen_faces.T.dot(test_matrix)
 
 svmclf.svmclassify(training_set=projected_values.T, training_class=training_classes, testing_set=testing_set.T, testing_class=testing_class)
-
-
