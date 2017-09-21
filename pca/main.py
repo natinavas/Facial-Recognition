@@ -1,7 +1,7 @@
 import numpy as np
 from classification import svmclf
 from kpca import kernel
-from methods.GrahamSchmidt import col
+from methods.GrahamSchmidt import col, row
 from pca import qr
 from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
@@ -53,7 +53,7 @@ def calculate_kernel_eigen(matrix, eig_method, qr_method):
 
 ##########
 
-THRESHOLD = 1 # Proportion of representation when choosing the best eigen vectors
+THRESHOLD = 0.95 # Proportion of representation when choosing the best eigen vectors
 
 args = arguments.get_arguments()
 
@@ -109,8 +109,8 @@ best_eig_vectors = best_eig_vectors(eig_values, eig_vectors, THRESHOLD)
 eigen_faces = centered_matrix.dot(best_eig_vectors)
 
 # Normalize eigen faces optimization
-row_sums = np.linalg.norm(eigen_faces, axis=1)
-eigen_faces = np.divide(eigen_faces,col(row_sums))
+row_sums = np.linalg.norm(eigen_faces, axis=0)
+eigen_faces = np.divide(eigen_faces,row(row_sums))
 
 # Project values on eigen vectors
 if(args.verbose):
