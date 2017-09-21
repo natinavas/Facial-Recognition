@@ -1,13 +1,13 @@
 import numpy as np
 from classification import svmclf
 from kpca import kernel
-from methods.GrahamSchmidt import col, row
+from methods.GramSchmidt import col, row
 from pca import qr
 from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
 from utils import ArgumentParser as arguments
 from methods import Householder as hh
-from methods import GrahamSchmidt as gs
+from methods import GramSchmidt as gs
 from utils import timer
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
@@ -72,16 +72,15 @@ images, training_classes = imageHandler.load_training_images(individual_count=TR
                                                              image_dir=args.images, image_type=args.image_type)
 
 # Create matrix out of images
+# Divide by 255 for optimization
 matrix = (np.matrix(images)).T/255.
 
 # Calculate mean different faces
 mean = matrix.mean(axis=1)
 imageHandler.save_image(mean, "mean.pgm")
 
-# Divide by standard deviation
-# standard_deviation = np.std(matrix, axis=1)
-standard_deviation = 1 #TODO
-centered_matrix = (matrix - mean)/standard_deviation
+# Center matrix
+centered_matrix = (matrix - mean)
 
 # Calculate the covariance matrix
 # Calculate centered matrix * transposed centered matrix to get a similar matrix to the one of the covariance

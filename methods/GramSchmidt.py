@@ -20,9 +20,10 @@ def qr_Gram_Schmidt(A):
             u[:,i] = u[:,i] - (inner(A[:,i], Q[:,j])  * Q[:,j] )
         Q[:,i] = np.divide(u[:,i], np.linalg.norm(u[:,i], 2))
     # Generate R
-    for k in range(0, A.shape[0]):
-        for m in range(k, A.shape[1]):
-                R[k,m] = inner(A[:,m], Q[:,k])
+    R = Q.T.dot(A)
+    # for k in range(0, A.shape[0]):
+    #     for m in range(k, A.shape[1]):
+    #         R[k,m] = inner(A[:,m], Q[:,k])
     return Q, R
 
 
