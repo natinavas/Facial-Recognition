@@ -27,14 +27,12 @@ def load_testing_images(individual_count, testing_size, image_dir, image_type='.
 
     return test_images, testing_class
 
-
-
 def save_images(images, file_name='outfile', image_type='.pgm'):
     i = 0
     for face in images:
         i += 1
         reshaped_face = np.reshape(face, [112, 92])
-        outfile = file_name + str(i) + image_type
+        outfile = "output/" + file_name + str(i) + image_type
         scipy.misc.imsave(outfile, reshaped_face)
 
 def save_image(image_matrix, image_name):
