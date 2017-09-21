@@ -9,7 +9,7 @@ def get_arguments():
     parser.add_argument('--qr_method', '-qrm', type=str, dest="qr_method", default="householder")
     parser.add_argument('--eig_method', '-em', type=str, dest="eig_method", default="qr")
     parser.add_argument('--verbose', '-v', type=bool, default=True, dest="verbose")
-    parser.add_argument('--type', '-t', type=str, default="lineal", dest="type")
+    parser.add_argument('--type', '-t', type=str, default="pca", dest="type")
     args = parser.parse_args()
 
     # Check parameters

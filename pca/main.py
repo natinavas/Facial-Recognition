@@ -4,9 +4,10 @@ from kpca import kernel
 from pca import qr
 from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
-from utils import Parser as arguments
+from utils import ArgumentParser as arguments
 from methods import Householder as hh
 from methods import GrahamSchmidt as gs
+from utils import timer
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
 
