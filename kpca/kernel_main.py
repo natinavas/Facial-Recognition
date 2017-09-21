@@ -7,7 +7,7 @@ from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
 from utils import ArgumentParser as arguments
 from methods import Householder as hh
-from methods import GrahamSchmidt as gs
+from methods import GramSchmidt as gs
 from utils import timer
 from sklearn import svm
 
@@ -68,27 +68,25 @@ def train_kpca():
 
     args = arguments.get_arguments()
 
-    # Training set characteristics
-    TRAINING_INDIVIDUALS = 20 #Amount of different individuals that will be classified
-    TRAINING_SET_SIZE = args.training_set_size #Amount of training images for each individual
-
-    TRAINING_IMAGES = TRAINING_INDIVIDUALS * TRAINING_SET_SIZE
-
     # Testing set characteristics
     TESTING_SET_SIZE = args.testing_set_size
-    TESTING_INDIVIDUALS = TRAINING_INDIVIDUALS
 
-    #TODO poner por parametros ambos y con las excepciones correspondientes
-    TESTING_IMAGES = TESTING_INDIVIDUALS * TESTING_SET_SIZE
+
+    # Training set characteristics
+    TRAINING_SET_SIZE = args.training_set_size  # Amount of training images for each individual
 
     # Load images
     if (args.verbose):
         print('Loading images')
-    images, training_classes = imageHandler.load_training_images(individual_count=TRAINING_INDIVIDUALS, training_size=TRAINING_SET_SIZE,
-                                                                 image_dir=args.images, image_type=args.image_type)
+    training_images, training_classes, testing_images, testing_classes = imageHandler.load_images(training_size=TRAINING_SET_SIZE,
+                                                                 testing_size=TESTING_SET_SIZE, image_dir=args.images)
+
+
+    TRAINING_IMAGES = len(training_images)
+
 
     # Create matrix out of images
-    matrix = ((np.matrix(images)) - 127.5) / 127.5
+    matrix = ((np.matrix(training_images)) - 127.5) / 127.5
 
     # Calculate K matrix and get eigen values and eigen vectors
     if (args.verbose):
@@ -112,8 +110,6 @@ def train_kpca():
 
 
 def test_kpca(clf, best_eig_vectors, matrix, K, test_image):
-    TRAINING_INDIVIDUALS = 20
-    TESTING_INDIVIDUALS = 20
     #TODO: check shape!!
     TRAINING_IMAGES = matrix.shape[0]
 
@@ -135,7 +131,7 @@ def test_kpca(clf, best_eig_vectors, matrix, K, test_image):
 
     ones_training = np.ones([TRAINING_IMAGES, TRAINING_IMAGES]) / TRAINING_IMAGES
     ones_testing = np.ones([TESTING_IMAGES, TRAINING_IMAGES]) / TRAINING_IMAGES
-    Ktest = (np.asarray(np.dot(test_matrix, matrix.T))/TRAINING_INDIVIDUALS+1)**2
+    Ktest = (np.asarray(np.dot(test_matrix, matrix.T))/TRAINING_IMAGES+1)**2
     Ktest = Ktest - np.dot(ones_testing, K) - np.dot(Ktest, ones_training) + np.dot(ones_testing, np.dot(K, ones_training))
     testing_projection = np.dot(Ktest, best_eig_vectors)
 
