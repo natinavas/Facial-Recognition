@@ -63,9 +63,9 @@ def eig_qr_shifted(M, qr_method):
 
 
 def shift(a,b,c):
-    r1,r2 = np.roots([(a*b - c*c), -(a+b), 1])
-    r1 = np.abs(r1-b)
-    r2 = np.abs(r2-b)
-    if r1 < r2:
+    r1,r2 = np.roots([1, -(a+b), (a*b - c)])
+    ra = np.abs(r1-b)
+    rb = np.abs(r2-b)
+    if ra < rb:
         return r1
     return r2
