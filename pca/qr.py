@@ -48,11 +48,8 @@ def eig_qr_shifted(M, qr_method):
     error = 0.001
 
     while n > 0:
-        print "n", n
         I = np.identity(n+1, dtype=None)
         while np.abs(B[n,n-1]) >= error:
-            print np.abs(B[n,n-1])
-
             s = shift(B[n-1,n-1],B[n,n],B[n-1,n])
             Q,R = qr_method(B - s*I)
 
