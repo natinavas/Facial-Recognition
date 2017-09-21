@@ -14,9 +14,6 @@ def svmclassify(training_set, training_class, testing_set, testing_class, verbos
                          %(len(testing_set), len(testing_class)))
 
     #Number of classes for effectiveness analysis
-    classCount = len(set(training_class))
-    if(verbose==1):
-        print("classCount = {}".format(classCount))
     #Setting up classifier
     clf = svm.LinearSVC()
 
@@ -25,7 +22,7 @@ def svmclassify(training_set, training_class, testing_set, testing_class, verbos
 
     classifications = clf.score(testing_set, testing_class)
 
-    print ("classifications", classifications)
+    print ("Correct classifications", classifications)
     #testing_class #
     #Setup for control
     # check, error = 0 , 0

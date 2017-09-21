@@ -1,6 +1,7 @@
 import numpy as np
 from classification import svmclf
 from kpca import kernel
+from methods.GrahamSchmidt import col
 from pca import qr
 from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
@@ -52,7 +53,7 @@ def calculate_kernel_eigen(matrix, eig_method, qr_method):
 
 ##########
 
-THRESHOLD = 0.95 # Proportion of representation when choosing the best eigen vectors
+THRESHOLD = 1 # Proportion of representation when choosing the best eigen vectors
 
 args = arguments.get_arguments()
 
@@ -71,8 +72,7 @@ images, training_classes = imageHandler.load_training_images(individual_count=TR
                                                              image_dir=args.images, image_type=args.image_type)
 
 # Create matrix out of images
-matrix = (np.matrix(images)).T
-# matrix = (np.matrix(images)).T/255.
+matrix = (np.matrix(images)).T/255.
 
 # Calculate mean different faces
 mean = matrix.mean(axis=1)
@@ -108,6 +108,10 @@ best_eig_vectors = best_eig_vectors(eig_values, eig_vectors, THRESHOLD)
 # http://blog.manfredas.com/eigenfaces-tutorial/
 eigen_faces = centered_matrix.dot(best_eig_vectors)
 
+# Normalize eigen faces optimization
+row_sums = np.linalg.norm(eigen_faces, axis=1)
+eigen_faces = np.divide(eigen_faces,col(row_sums))
+
 # Project values on eigen vectors
 if(args.verbose):
     print('Projecting values on eigen vectors')
@@ -122,8 +126,7 @@ if(args.verbose):
 test_images, testing_class = imageHandler.load_testing_images(individual_count=TESTING_INDIVIDUALS, testing_size=TESTING_SET_SIZE, image_dir=args.images, image_type=args.image_type)
 
 # Generate matrices from loaded images
-test_matrix = np.matrix(test_images).T
-# test_matrix = np.matrix(test_images).T/255.
+test_matrix = np.matrix(test_images).T/255.
 test_matrix = test_matrix - mean
 
 testing_set = eigen_faces.T.dot(test_matrix)

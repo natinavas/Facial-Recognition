@@ -27,6 +27,7 @@ def eig_qr(A, qr_method):
     eigvalues = np.diagonal(R)
 
     # Order the eigenvalues
+    # Save the new order of the old indices in order to reorder the eigen vectors (C)
     indices = sorted(range(len(eigvalues)), reverse=True, key=lambda x: abs(eigvalues[x]))
     eigvalues = sorted(eigvalues, key=abs, reverse=True)
     C = np.matrix(C)
@@ -40,11 +41,13 @@ def eig_qr_shifted(M, qr_method):
     B = H
     eigvec = np.identity(n, dtype=None)
     n -= 1
-    error = 0.00001
+    error = 0.001
 
     while n > 0:
+        # print n
         I = np.identity(n+1, dtype=None)
         while np.abs(B[n,n-1]) >= error:
+            print np.abs(B[n,n-1])
             s = shift(B[n-1,n-1],B[n,n],B[n-1,n])
             Q,R = qr_method(B - s*I)
 
@@ -60,6 +63,7 @@ def eig_qr_shifted(M, qr_method):
         B = H[0:n + 1, 0:n + 1]
 
     return np.diag(H), t.dot(eigvec)
+
 
 
 def shift(a,b,c):
