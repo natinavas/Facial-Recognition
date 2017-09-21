@@ -15,15 +15,15 @@ def load_training_images(individual_count, training_size, image_dir, image_type=
     return images, training_classes
 
 def load_testing_images(individual_count, testing_size, image_dir, image_type='.pgm'):
-    test_images = list(None for i in range(individual_count * (10 - testing_size)))
+    test_images = list(None for i in range(individual_count * testing_size))
 
-    testing_class = np.zeros(individual_count * (10 - testing_size))
+    testing_class = np.zeros(individual_count * testing_size)
     for i in range(1, individual_count + 1):
-        for j in range(testing_size + 1, 11):
+        for j in range(10 - testing_size + 1, 11):
             dir = image_dir + str(i) + "/" + str(j) + image_type
-            test_images[(i - 1) * (10 - testing_size) + (j - testing_size) - 1] = list(
+            test_images[(i - 1) * testing_size + (j - (10 - testing_size)) - 1] = list(
                 Image.open(dir).getdata())
-            testing_class[(i - 1) * (10 - testing_size) + (j - testing_size) - 1] = i
+            testing_class[(i - 1) * testing_size + (j - (10 - testing_size)) - 1] = i
 
     return test_images, testing_class
 
