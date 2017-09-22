@@ -75,7 +75,7 @@ def train_kpca():
     # Load images
     if (args.verbose):
         print('Loading images')
-    training_images, training_classes, testing_images, testing_classes = imageHandler.load_images(training_size=TRAINING_SET_SIZE,
+    training_images, training_classes, testing_images, testing_classes, profiles, profile_map = imageHandler.load_images(training_size=TRAINING_SET_SIZE,
                                                                  testing_size=TESTING_SET_SIZE, image_dir=args.images)
 
 
@@ -107,7 +107,7 @@ def train_kpca():
 
     classifications = clf.score(testing_projection, testing_classes)
 
-    return clf, eigen_faces, matrix, K, classifications
+    return clf, eigen_faces, matrix, K, classifications, profiles, profile_map
 
 
 def test_kpca(clf, eigen_faces, matrix, K, test_image):

@@ -1,8 +1,14 @@
+import csv
 import numpy as np
 import os
+import tkFileDialog
+from Tkinter import Tk, Toplevel
+
 import scipy
 import scipy.misc
 from PIL import Image
+
+from utils.ProfileHandler import Profile
 
 
 def load_images(training_size, testing_size, image_dir):
@@ -10,13 +16,23 @@ def load_images(training_size, testing_size, image_dir):
     training_images = list()
     testing_images = list()
     testing_classes = list()
+    profiles = list()
+    profile_map = dict()
+
 
     for subdir, dirs, files in os.walk(image_dir):
         counter = 0
+        first = True
         for file in files:
-            if not subdir.startswith('.') and not file.startswith('.'):
+            if not subdir.startswith('.') and not file.startswith('.') and not file.endswith('.csv'):
                 image_class = os.path.basename(os.path.normpath(subdir))
                 path = subdir + "/" + file
+                if(first):
+                    first = False
+                    profile_path = subdir + "/profile"
+                    profiles.append(load_profile(path, profile_path))
+                    profile_map[image_class] = len(profiles)-1
+
                 if counter < training_size:
                     training_classes.append(image_class)
                     training_images.append(list(Image.open(path).getdata()))
@@ -25,7 +41,7 @@ def load_images(training_size, testing_size, image_dir):
                     testing_images.append(list(Image.open(path).getdata()))
                 counter+=1
 
-    return training_images, training_classes, testing_images, testing_classes
+    return training_images, training_classes, testing_images, testing_classes, profiles, profile_map
 
 def load_testing_images(individual_count, testing_size, image_dir, image_type='.pgm'):
     test_images = list(None for i in range(individual_count * testing_size))
@@ -51,3 +67,9 @@ def save_images(images, file_name='outfile', image_type='.pgm'):
 def save_image(image_matrix, image_name):
     mean_face = np.reshape(image_matrix, [112, 92])
     scipy.misc.imsave(image_name, mean_face)
+
+def load_profile(image_dir, profile_dir, file_type = ".csv"):
+    csv_dir = profile_dir + file_type
+    reader = csv.reader(open(csv_dir))
+    for row in reader:
+        return Profile(row[0], int(row[1]), row[2], int(row[3]), image_dir, row[4])

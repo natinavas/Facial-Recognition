@@ -15,7 +15,7 @@
 *.pyc
 
 # Images #
-att_faces/
+#att_faces/
 
 # Packages #
 ############

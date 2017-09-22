@@ -65,7 +65,7 @@ def train():
     # Load images
     if (args.verbose):
         print('Loading images')
-    training_images, training_classes, testing_images, testing_classes = imageHandler.load_images(training_size=TRAINING_SET_SIZE, testing_size=TESTING_SET_SIZE, image_dir=args.images)
+    training_images, training_classes, testing_images, testing_classes, profile, profiles_map = imageHandler.load_images(training_size=TRAINING_SET_SIZE, testing_size=TESTING_SET_SIZE, image_dir=args.images)
 
     # Create matrix out of images
     matrix = (np.matrix(training_images)).T / 255.
@@ -128,7 +128,7 @@ def train():
     clf.fit(projected_values.T, training_classes)
     classifications = clf.score(testing_set.T, testing_classes)
 
-    return mean, eigen_faces, clf, classifications
+    return mean, eigen_faces, clf, classifications, profile, profiles_map
 
     #svmclf.svmclassify(training_set=projected_values.T, training_class=training_classes, testing_set=testing_set.T, testing_class=testing_classes)
 
