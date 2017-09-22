@@ -1,6 +1,6 @@
 #Image Files#
 *.img
-*.pgm
+#*.pgm
 *.bmp
 *.jpg
 
