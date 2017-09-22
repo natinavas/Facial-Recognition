@@ -1,14 +1,11 @@
 import numpy as np
-# from classification import svmclf
-from kpca import kernel
-from methods.GrahamSchmidt import col, row
+from methods.GramSchmidt import col, row
 from pca import qr
 from pca.qr import eig_qr_shifted, eig_qr
 from utils import ImageHandler as imageHandler
 from utils import ArgumentParser as arguments
 from methods import Householder as hh
 from methods import GramSchmidt as gs
-from utils import timer
 from sklearn import svm
 
 """http://www.face-rec.org/algorithms/pca/jcn.pdf"""
@@ -97,44 +94,41 @@ def train_kpca():
     # Get best eigenvalues
     if(args.verbose):
         print('Getting representative eigen values')
-    best_eig_vectors = get_best_eig_vectors(eig_values, eig_vectors, THRESHOLD)
+    eigen_faces = get_best_eig_vectors(eig_values, eig_vectors, THRESHOLD)
     if(args.verbose):
-        print('number of eigen faces used: ', best_eig_vectors.shape[1])
+        print('number of eigen faces used: ', eigen_faces.shape[1])
 
-    eigen_faces = np.dot(K.T, best_eig_vectors)
+    training_projection = np.dot(K.T, eigen_faces)
 
     clf = svm.LinearSVC()
-    clf.fit(eigen_faces, training_classes)
+    clf.fit(training_projection, training_classes)
 
-    return clf, best_eig_vectors, matrix, K
+    testing_projection = get_testing_data(matrix, eigen_faces, testing_images, K)
+
+    classifications = clf.score(testing_projection, testing_classes)
+
+    return clf, eigen_faces, matrix, K, classifications
 
 
-def test_kpca(clf, best_eig_vectors, matrix, K, test_image):
-    #TODO: check shape!!
-    TRAINING_IMAGES = matrix.shape[0]
-
-    args = arguments.get_arguments()
-    TESTING_SET_SIZE = args.testing_set_size
-
-    args = arguments.get_arguments()
-
-    # Load test images
-    # if(args.verbose):
-    #     print('Loading testing images')
-    # test_images, testing_class = imageHandler.load_testing_images(individual_count=TESTING_INDIVIDUALS, testing_size=TESTING_SET_SIZE, image_dir=args.images, image_type=args.image_type)
-
-    #TODO: check shape!!
-    TESTING_IMAGES = len(test_image)
-
-    test_matrix = np.matrix(test_image)
-    test_matrix = (test_matrix - 127.5) / 127.5
-
-    ones_training = np.ones([TRAINING_IMAGES, TRAINING_IMAGES]) / TRAINING_IMAGES
-    ones_testing = np.ones([TESTING_IMAGES, TRAINING_IMAGES]) / TRAINING_IMAGES
-    Ktest = (np.asarray(np.dot(test_matrix, matrix.T))/TRAINING_IMAGES+1)**2
-    Ktest = Ktest - np.dot(ones_testing, K) - np.dot(Ktest, ones_training) + np.dot(ones_testing, np.dot(K, ones_training))
-    testing_projection = np.dot(Ktest, best_eig_vectors)
+def test_kpca(clf, eigen_faces, matrix, K, test_image):
+    testing_projection = get_testing_data(matrix, eigen_faces, test_image, K)
 
     classification = clf.predict(testing_projection)
 
     return classification
+
+def get_testing_data(matrix, eigen_faces, test_images, K):
+    TRAINING_IMAGES = matrix.shape[0]
+    TESTING_IMAGES = len(test_images)
+
+    test_matrix = np.matrix(test_images)
+    test_matrix = (test_matrix - 127.5) / 127.5
+
+    ones_training = np.ones([TRAINING_IMAGES, TRAINING_IMAGES]) / TRAINING_IMAGES
+    ones_testing = np.ones([TESTING_IMAGES, TRAINING_IMAGES]) / TRAINING_IMAGES
+    Ktest = (np.asarray(np.dot(test_matrix, matrix.T)) / TRAINING_IMAGES + 1) ** 2
+    Ktest = Ktest - np.dot(ones_testing, K) - np.dot(Ktest, ones_training) + np.dot(ones_testing,
+                                                                                    np.dot(K, ones_training))
+    testing_projection = np.dot(Ktest, eigen_faces)
+
+    return testing_projection
